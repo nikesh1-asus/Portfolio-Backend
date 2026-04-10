@@ -10,7 +10,7 @@ export const Hero = () => {
   const [showModal, setShowModal] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  // ✅ BASE URL (VERY IMPORTANT FOR DEPLOYMENT)
+  // ✅ BASE URL (CRITICAL FIX)
   const base = import.meta.env.BASE_URL;
 
   // ✨ TYPEWRITER
@@ -45,12 +45,16 @@ export const Hero = () => {
     localStorage.setItem("cv_downloads", Number(count) + 1);
   };
 
-  // ✅ FIXED SOCIAL LINKS
+  // ✅ SOCIAL LINKS
   const socialLinks = [
     { href: "https://github.com/nikesh1-asus", icon: <FaGithub size={22} /> },
     { href: "https://www.linkedin.com/in/nikesh-ojha-3698a7223/", icon: <FaLinkedin size={22} /> },
     { href: "https://www.facebook.com/nikesh.ojha.752", icon: <FaFacebook size={22} /> },
   ];
+
+  // 📄 FIXED FILE PATHS
+  const cvFile = `${base}Nikesh.pdf`;
+  const profileImg = `${base}nikeshh.png`;
 
   return (
     <section
@@ -59,7 +63,7 @@ export const Hero = () => {
       className="min-h-[100dvh] pt-16 md:pt-0 flex flex-col md:flex-row items-center justify-center gap-10 md:gap-20 lg:gap-28 px-6 md:px-20 lg:px-32"
     >
 
-      {/* ✅ SOCIAL LINKS - DESKTOP */}
+      {/* SOCIAL DESKTOP */}
       {location.pathname === "/" && (
         <div className="hidden md:flex flex-col gap-4 fixed left-4 top-1/2 transform -translate-y-1/2 z-[1000]">
           {socialLinks.map((link, idx) => (
@@ -77,7 +81,7 @@ export const Hero = () => {
       )}
 
       {/* TEXT */}
-      <div className="w-full md:w-[42%] flex flex-col items-center justify-center text-center order-2 md:order-1">
+      <div className="w-full md:w-[42%] flex flex-col items-center text-center order-2 md:order-1">
 
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold">
           Hi, I'm <span className="gradient-text">NIKESH OJHA</span>
@@ -87,15 +91,16 @@ export const Hero = () => {
           <span ref={typedRef}></span>
         </h2>
 
-        <p className="mt-4 text-gray-400 max-w-xl leading-relaxed text-base">
-          I craft modern, scalable web applications using React, Next.js, and Django,
-          while leveraging GitHub and Jira for streamlined development and collaboration.
+        <p className="mt-4 text-gray-400 max-w-xl leading-relaxed">
+          I craft modern, scalable web applications using React, Next.js, and Django.
         </p>
 
-        {/* ✅ BUTTONS */}
+        {/* BUTTONS */}
         <div className="mt-6 flex flex-wrap gap-3 justify-center">
+
+          {/* DOWNLOAD CV (SAFE) */}
           <a
-            href={`${base}Nikesh.pdf`}
+            href={cvFile}
             download
             onClick={handleDownload}
             className="glow-btn flex items-center gap-2"
@@ -103,6 +108,7 @@ export const Hero = () => {
             <FaDownload /> Download CV
           </a>
 
+          {/* PREVIEW CV (FIXED SAFETY) */}
           <button
             onClick={() => setShowModal(true)}
             className="glow-btn flex items-center gap-2"
@@ -115,7 +121,7 @@ export const Hero = () => {
           </a>
         </div>
 
-        {/* ✅ SOCIAL LINKS - MOBILE */}
+        {/* MOBILE SOCIAL */}
         {location.pathname === "/" && (
           <div className="flex md:hidden gap-6 mt-4 justify-center">
             {socialLinks.map((link, idx) => (
@@ -133,7 +139,7 @@ export const Hero = () => {
         )}
       </div>
 
-      {/* ✅ IMAGE */}
+      {/* IMAGE (FIXED) */}
       <div className="w-full md:w-[42%] flex justify-center md:justify-end order-1 md:order-2">
         <div
           style={{
@@ -143,7 +149,7 @@ export const Hero = () => {
         >
           <div className="blob animate-float">
             <img
-              src={`${base}nikeshh.png`}
+              src={profileImg}
               alt="profile"
               className="blob-img"
             />
@@ -151,25 +157,28 @@ export const Hero = () => {
         </div>
       </div>
 
-      {/* ✅ MODAL */}
+      {/* MODAL (FIXED + SAFE PDF LOADING) */}
       {showModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[2000]">
           <div className="bg-[#0f1418] w-[90%] md:w-[70%] h-[80%] rounded-xl overflow-hidden shadow-xl relative">
+
             <button
               onClick={() => setShowModal(false)}
-              className="absolute top-3 right-4 text-white text-xl hover:text-teal-400"
+              className="absolute top-3 right-4 text-white text-xl hover:text-teal-400 z-10"
             >
               ✕
             </button>
 
+            {/* PDF SAFE VIEW */}
             <iframe
-              src={`${base}Nikesh.pdf`}
+              src={cvFile}
               title="CV Preview"
               className="w-full h-full"
             />
           </div>
         </div>
       )}
+
     </section>
   );
 };

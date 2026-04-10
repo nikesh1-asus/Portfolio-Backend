@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight, FaQuoteLeft, FaStar } from "react-icons/fa";
 
+// ✅ FIX: BASE URL for GitHub Pages
+const base = import.meta.env.BASE_URL;
+
 const testimonials = [
   {
     id: 1,
@@ -11,7 +14,7 @@ const testimonials = [
     ],
     name: "Suresh Shrestha",
     title: "Client",
-    image: "/Suresh.png",
+    image: `${base}Suresh.png`,
     rating: 4,
   },
   {
@@ -23,7 +26,7 @@ const testimonials = [
     ],
     name: "Manish Pandey",
     title: "Client",
-    image: "/Manish.png",
+    image: `${base}Manish.png`,
     rating: 5,
   },
   {
@@ -35,7 +38,7 @@ const testimonials = [
     ],
     name: "Niraj Ojha",
     title: "Client",
-    image: "/Niraj.png",
+    image: `${base}Niraj.png`,
     rating: 5,
   },
   {
@@ -47,7 +50,7 @@ const testimonials = [
     ],
     name: "Rubin Chaulagain",
     title: "Client",
-    image: "/Rubin.png",
+    image: `${base}Rubin.png`,
     rating: 5,
   },
 ];
@@ -62,9 +65,8 @@ export const Testimonials = () => {
     const feedbackLength = testimonials[index].feedback.length;
     const rating = testimonials[index].rating;
 
-    // reset properly (FIXED BUG)
     setParagraphVisible(Array(feedbackLength).fill(false));
-    setStarsVisible(Array(rating).fill(false));
+    setStarsVisible(Array(5).fill(false));
     setPhotoSlide(true);
 
     // animate paragraphs
@@ -78,7 +80,7 @@ export const Testimonials = () => {
       }, i * 300);
     });
 
-    // animate stars after text
+    // animate stars
     setTimeout(() => {
       Array.from({ length: rating }).forEach((_, i) => {
         setTimeout(() => {
@@ -91,7 +93,6 @@ export const Testimonials = () => {
       });
     }, feedbackLength * 300);
 
-    // reset photo animation
     setTimeout(() => {
       setPhotoSlide(false);
     }, feedbackLength * 300 + rating * 200 + 500);
@@ -109,18 +110,20 @@ export const Testimonials = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const next = () => setActiveIdx((prev) => (prev + 1) % testimonials.length);
-  const previous = () => setActiveIdx((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  const next = () =>
+    setActiveIdx((prev) => (prev + 1) % testimonials.length);
+
+  const previous = () =>
+    setActiveIdx((prev) => (prev - 1 + testimonials.length) % testimonials.length);
 
   return (
     <section id="testimonials" className="py-16 relative overflow-hidden bg-background">
-      
-      {/* background glow */}
+
       <div className="absolute top-1/2 left-1/2 w-[800px] h-[800px] bg-muted/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
 
       <div className="container mx-auto px-6 relative z-10">
-        
-        {/* header */}
+
+        {/* HEADER */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-muted-foreground text-sm font-medium uppercase">
             What Clients Say
@@ -132,21 +135,20 @@ export const Testimonials = () => {
           </h2>
         </div>
 
-        {/* slider */}
+        {/* SLIDER */}
         <div className="max-w-4xl mx-auto relative overflow-hidden rounded-3xl glass-strong glow-border">
-          
+
           <div
             className="flex transition-transform duration-500"
             style={{ transform: `translateX(-${activeIdx * 100}%)` }}
           >
             {testimonials.map((t, idx) => (
-              
               <div
                 key={t.id}
                 className="min-w-full text-foreground flex flex-col md:flex-row items-center"
               >
-                
-                {/* image */}
+
+                {/* IMAGE */}
                 <div
                   className={`w-full md:w-1/3 flex-shrink-0 transform transition-transform duration-500 ${
                     photoSlide && idx === activeIdx
@@ -161,15 +163,14 @@ export const Testimonials = () => {
                   />
                 </div>
 
-                {/* content */}
+                {/* CONTENT */}
                 <div className="p-6 md:p-12 md:w-2/3 relative">
-                  
-                  {/* quote icon */}
+
                   <div className="absolute -top-4 left-8 w-12 h-12 rounded-full flex items-center justify-center bg-background">
                     <FaQuoteLeft className="w-6 h-6 text-primary" />
                   </div>
 
-                  {/* feedback */}
+                  {/* FEEDBACK */}
                   <div>
                     {t.feedback.map((para, i) => (
                       <p
@@ -185,7 +186,7 @@ export const Testimonials = () => {
                     ))}
                   </div>
 
-                  {/* stars */}
+                  {/* STARS */}
                   <div className="flex items-center mb-4 mt-2">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <FaStar
@@ -207,7 +208,7 @@ export const Testimonials = () => {
                     ))}
                   </div>
 
-                  {/* name */}
+                  {/* NAME */}
                   <div className="mt-2">
                     <div className="font-semibold text-lg">{t.name}</div>
                     <div className="text-sm text-muted-foreground">
@@ -215,14 +216,15 @@ export const Testimonials = () => {
                     </div>
                   </div>
                 </div>
+
               </div>
             ))}
           </div>
         </div>
 
-        {/* controls */}
+        {/* CONTROLS */}
         <div className="flex items-center justify-center gap-4 mt-6">
-          
+
           <button
             onClick={previous}
             className="p-3 rounded-full bg-secondary hover:bg-muted transition"
@@ -236,9 +238,7 @@ export const Testimonials = () => {
                 key={idx}
                 onClick={() => setActiveIdx(idx)}
                 className={`h-2 rounded-full transition-all ${
-                  idx === activeIdx
-                    ? "w-8 bg-primary"
-                    : "w-2 bg-muted"
+                  idx === activeIdx ? "w-8 bg-primary" : "w-2 bg-muted"
                 }`}
               />
             ))}
@@ -253,7 +253,7 @@ export const Testimonials = () => {
         </div>
       </div>
 
-      {/* star animation */}
+      {/* ANIMATION */}
       <style jsx>{`
         @keyframes bounce-once {
           0% { transform: scale(0.5); }
@@ -264,6 +264,7 @@ export const Testimonials = () => {
           animation: bounce-once 0.3s forwards;
         }
       `}</style>
+
     </section>
   );
 };

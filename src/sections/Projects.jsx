@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// ✅ BASE URL FIX (IMPORTANT for GitHub Pages)
+const base = import.meta.env.BASE_URL;
+
 export const Projects = () => {
   const [cursorPreview, setCursorPreview] = useState(null);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
@@ -19,47 +22,47 @@ export const Projects = () => {
       description:
         "Travel booking system with real-time availability and pricing.",
       technologies: ["PHP", "SQL", "CSS", "HTML", "JavaScript"],
-      image: "/projects/Travel.png",
+      image: `${base}projects/Travel.png`,
       github: "https://github.com/nikesh1-asus/Travel.git",
     },
     {
       title: "E-commerce Platform",
       description: "Full shopping platform with cart and payments.",
       technologies: ["React", "Django", "Stripe"],
-      image: "/projects/E-commerce.png",
+      image: `${base}projects/E-commerce.png`,
       github: "https://github.com/nikesh1-asus/E-Commerce-Site.git",
     },
     {
       title: "Blog Management System",
       description: "Blog system with authentication and roles.",
       technologies: ["Django", "React", "SQLite"],
-      image: "/projects/blog.png",
+      image: `${base}projects/blog.png`,
       github: "https://github.com/nikesh1-asus/Django-Blog.git",
     },
     {
       title: "Suitcase Android App",
       description: "App for managing travel essentials.",
       technologies: ["Java", "Firebase", "Android Studio"],
-      image: "/projects/Suitcase-Android-App.png",
+      image: `${base}projects/Suitcase-Android-App.png`,
       github: "https://github.com/nikesh1-asus/Suitcase-App.git",
     },
     {
       title: "Heart Disease Prediction",
       description: "ML model for predicting heart disease.",
       technologies: ["Python", "TensorFlow", "Pandas"],
-      image: "/projects/Heart-Disease-Prediction.png",
+      image: `${base}projects/Heart-Disease-Prediction.png`,
       github: "https://github.com/nikesh1-asus/Heart-Diseases-Prediction.git",
     },
     {
       title: "Weather Forecasting App",
       description: "ML-based weather prediction system.",
       technologies: ["Python", "TensorFlow", "Pandas"],
-      image: "/projects/weather.png",
+      image: `${base}projects/weather.png`,
       github: "https://github.com/nikesh1-asus/Weather-App.git",
     },
   ];
 
-  // 🔍 GLOBAL SEARCH
+  // 🔍 SEARCH FILTER
   const filteredProjects = projects.filter((project) =>
     `${project.title} ${project.description} ${project.technologies.join(" ")}`
       .toLowerCase()
@@ -69,9 +72,7 @@ export const Projects = () => {
   // 📄 PAGINATION
   const paginatedProjects = [];
   for (let i = 0; i < filteredProjects.length; i += projectsPerPage) {
-    paginatedProjects.push(
-      filteredProjects.slice(i, i + projectsPerPage)
-    );
+    paginatedProjects.push(filteredProjects.slice(i, i + projectsPerPage));
   }
 
   const totalPages = paginatedProjects.length;
@@ -86,7 +87,7 @@ export const Projects = () => {
           My Selected Projects
         </h2>
 
-        {/* 🔍 SEARCH (animated) */}
+        {/* 🔍 SEARCH INPUT */}
         <motion.input
           type="text"
           placeholder="Search projects"
@@ -127,7 +128,6 @@ export const Projects = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -30 }}
                       transition={{ duration: 0.4 }}
-
                       onMouseEnter={() => setCursorPreview(project)}
                       onMouseMove={(e) =>
                         setCursorPos({ x: e.clientX, y: e.clientY })
@@ -209,6 +209,7 @@ export const Projects = () => {
             <img
               src={cursorPreview.image}
               className="w-full h-full object-cover"
+              alt="preview"
             />
           </div>
         </div>
@@ -228,6 +229,7 @@ export const Projects = () => {
             <img
               src={selectedProject.image}
               className="w-full h-[350px] object-cover rounded-2xl mb-6"
+              alt={selectedProject.title}
             />
 
             <div className="grid md:grid-cols-2 gap-10">

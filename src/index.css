@@ -1,0 +1,340 @@
+@import "tailwindcss";
+
+/* ===================== CUSTOM THEME ===================== */
+@theme {
+  --color-background: #0f1418;
+  --color-foreground: #f0f2f5;
+
+  --color-card: #141a1f;
+
+  --color-primary: #20b2a6;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #1f2830;
+  --color-secondary-foreground: #20b2a6;
+
+  --color-muted: #252e37;
+  --color-muted-foreground: #7a8491;
+
+  --color-border: #242b32;
+
+  --radius: 0.75rem;
+
+  --color-highlight: #f5a623;
+  --color-surface: #1a2329;
+}
+
+/* ===================== BASE STYLES ===================== */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: "Inter", sans-serif;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  .font-serif {
+    font-family: "Playfair Display", serif;
+  }
+}
+
+/* ===================== COMPONENTS ===================== */
+@layer components {
+  /* ----------------- GLASS CARDS ----------------- */
+  .glass {
+    @apply p-4 rounded-lg;
+    background-color: color-mix(in srgb, var(--color-surface) 50%, transparent);
+    backdrop-filter: blur(16px);
+    border: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+  }
+
+  @screen sm {
+    .glass {
+      @apply p-6;
+    }
+  }
+
+  @screen md {
+    .glass {
+      @apply p-8;
+    }
+  }
+
+  .glass-strong {
+    @apply p-4 rounded-lg;
+    background-color: color-mix(in srgb, var(--color-surface) 80%, transparent);
+    backdrop-filter: blur(24px);
+    border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  }
+
+  @screen sm {
+    .glass-strong {
+      @apply p-6;
+    }
+  }
+
+  @screen md {
+    .glass-strong {
+      @apply p-8;
+    }
+  }
+
+  /* ----------------- GLOW TEXT ----------------- */
+  .glow-text {
+    text-shadow: 0 0 30px color-mix(in srgb, var(--color-primary) 50%, transparent);
+  }
+
+  /* ----------------- GLOW BORDER ----------------- */
+  .glow-border {
+    box-shadow: 0 0 20px color-mix(in srgb, var(--color-primary) 20%, transparent),
+                inset 0 0 20px color-mix(in srgb, var(--color-primary) 5%, transparent);
+  }
+
+  /* ----------------- SOCIAL ICON ----------------- */
+  .icon {
+    @apply text-gray-400 text-2xl transition-all duration-300 hover:text-teal-400 hover:scale-110;
+  }
+
+  @screen sm {
+    .icon {
+      @apply text-3xl;
+    }
+  }
+
+  @screen md {
+    .icon {
+      @apply text-4xl;
+    }
+  }
+
+  /* ----------------- GLOW BUTTON ----------------- */
+  .glow-btn {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-black bg-teal-400 transition-all duration-300;
+    box-shadow: 0 0 10px #20b2a6, 0 0 20px #20b2a6;
+    animation: pulseGlow 2s infinite;
+  }
+
+  .glow-btn:hover {
+    box-shadow: 0 0 25px #20b2a6, 0 0 50px #20b2a6;
+    transform: scale(1.05);
+  }
+
+  @screen sm {
+    .glow-btn {
+      @apply px-8 py-4 text-base;
+    }
+  }
+
+  @screen md {
+    .glow-btn {
+      @apply px-10 py-5 text-lg;
+    }
+  }
+
+  /* ----------------- OUTLINE BUTTON ----------------- */
+  .outline-btn {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-teal-400 text-teal-400 transition-all duration-300;
+  }
+
+  .outline-btn:hover {
+    @apply bg-teal-400 text-black;
+  }
+
+  @screen sm {
+    .outline-btn {
+      @apply px-8 py-4 text-base;
+    }
+  }
+
+  @screen md {
+    .outline-btn {
+      @apply px-10 py-5 text-lg;
+    }
+  }
+}
+
+/* ===================== UTILITIES & ANIMATIONS ===================== */
+@layer utilities {
+  /* ----------------- FADE ANIMATIONS ----------------- */
+  @keyframes fade-in-up {
+    0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.8s ease-out both;
+  }
+
+  /* ----------------- FLOAT & DRIFT ----------------- */
+  @keyframes slow-drift {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(20px, -30px); }
+    50% { transform: translate(-15px, -20px); }
+    75% { transform: translate(30px, 10px); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+
+  /* ----------------- PULSE GLOW ----------------- */
+  @keyframes pulseGlow {
+    0% { box-shadow: 0 0 10px #20b2a6; }
+    50% { box-shadow: 0 0 30px #20b2a6; }
+    100% { box-shadow: 0 0 10px #20b2a6; }
+  }
+
+  /* ----------------- ANIMATION DELAYS ----------------- */
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-500 { animation-delay: 500ms; }
+  .animation-delay-600 { animation-delay: 600ms; }
+  .animation-delay-800 { animation-delay: 800ms; }
+
+  /* ----------------- BORDER & GLOW EFFECT ----------------- */
+  @keyframes animated-border { 0% { stroke-dashoffset: 400; } 100% { stroke-dashoffset: -550; } }
+
+  .group:hover .animated-border-path { animation: animated-border 1.5s linear infinite; }
+
+  .animated-border:hover {
+    background-color: color-mix(in srgb, #26c4b8 15%, transparent);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 0 20px color-mix(in srgb, #26c4b8 20%, transparent);
+  }
+
+  .timeline-glow {
+    box-shadow: 0 0 40px color-mix(in srgb, var(--color-primary) 35%, transparent),
+                0 0 80px color-mix(in srgb, var(--color-primary) 25%, transparent);
+  }
+
+  /* ----------------- 3D SWING ----------------- */
+  @keyframes swing-3d {
+    0% { transform: rotateY(-10deg) rotateX(2deg); }
+    25% { transform: rotateY(10deg) rotateX(-2deg); }
+    50% { transform: rotateY(-10deg) rotateX(2deg); }
+    75% { transform: rotateY(10deg) rotateX(-2deg); }
+    100% { transform: rotateY(-10deg) rotateX(2deg); }
+  }
+
+  .animate-swing-3d {
+    animation: swing-3d 4s ease-in-out infinite;
+    transform-style: preserve-3d;
+  }
+
+  /* ----------------- RESPONSIVE MEDIA ----------------- */
+  img, video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0.5rem;
+  }
+}
+/* ----------------- 3D LOGO ----------------- */
+.logo-3d {
+  font-weight: 800;
+  font-size: 2rem;
+  color: var(--color-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow:
+    1px 1px 0 #000,
+    2px 2px 0 #111,
+    3px 3px 0 #222,
+    4px 4px 0 #333;
+  transform-style: preserve-3d;
+  transition: all 0.3s ease;
+}
+
+.logo-3d span {
+  color: var(--color-primary);
+}
+
+.logo-3d:hover {
+  transform: translateY(-2px) rotateX(5deg) rotateY(5deg);
+  text-shadow:
+    1px 1px 2px #000,
+    2px 2px 4px #111,
+    3px 3px 6px #222,
+    4px 4px 8px #333;
+}
+
+/* ===================== BLOB IMAGE ===================== */
+.blob {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+
+  /* blob shape */
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+
+  /* animation */
+  animation: blobAnim 8s ease-in-out infinite;
+
+  /* optional subtle glow (remove if not needed) */
+  box-shadow: 0 0 25px rgba(32, 178, 166, 0.4);
+}
+
+.blob-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* animation */
+@keyframes blobAnim {
+  0% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  50% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+  100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+}
+.gradient-text {
+  background: linear-gradient(90deg, #20b2a6, #00f5d4, #20b2a6);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientMove 3s linear infinite;
+  text-shadow: 0 0 25px rgba(32, 178, 166, 0.5);
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0%; }
+  100% { background-position: 200%; }
+}

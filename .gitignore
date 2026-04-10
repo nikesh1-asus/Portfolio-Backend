@@ -1,0 +1,85 @@
+# =========================
+# 🔒 ENV & SECRETS (CRITICAL)
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# 📦 Dependencies
+# =========================
+node_modules/
+
+# =========================
+# 🏗 Build / Production
+# =========================
+dist/
+build/
+dist-ssr/
+.vite/
+
+# =========================
+# 🧾 Logs
+# =========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# 💻 Editor / OS files
+# =========================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# =========================
+# 🗄 Database (local only)
+# =========================
+data/
+*.db
+*.sqlite
+dump/
+
+# =========================
+# 🔐 Backend secrets
+# =========================
+config/secrets.json
+config/*.key
+config/*.pem
+
+# =========================
+# 🖼 Uploads (user files - IMPORTANT)
+# =========================
+uploads/
+temp/
+
+# =========================
+# 📄 PDF FILE HANDLING (IMPORTANT RULE)
+# =========================
+
+# ❌ DO NOT TRACK user uploaded PDFs
+uploads/**/*.pdf
+
+# ✅ ALLOW project/documentation PDFs (optional folder)
+!docs/
+!docs/**/*.pdf
+
+# =========================
+# 🖼 Optional image blocking (uncomment if needed)
+# =========================
+# *.png
+# *.jpg
+# *.jpeg
+# *.gif
+# *.webp
+
+# =========================
+# 📁 Cache
+# =========================
+.cache/
+.eslintcache
+coverage/
+*.local

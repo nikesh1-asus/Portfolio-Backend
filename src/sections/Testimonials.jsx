@@ -1,5 +1,10 @@
-import { useState, useEffect } from "react";
-import { FaChevronLeft, FaChevronRight, FaQuoteLeft, FaStar } from "react-icons/fa";
+import { useEffect, useMemo, useState } from "react";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaQuoteLeft,
+  FaStar,
+} from "react-icons/fa";
 
 // ✅ FIX: BASE URL for GitHub Pages
 const base = import.meta.env.BASE_URL;
@@ -10,7 +15,7 @@ const testimonials = [
     feedback: [
       "Nikesh is an exceptional software engineer. His code is clean, efficient, and reliable.",
       "He consistently delivers projects on time and helps improve our system architecture significantly.",
-      "His creativity and problem-solving skills make him a joy to work with."
+      "His creativity and problem-solving skills make him a joy to work with.",
     ],
     name: "Suresh Shrestha",
     title: "Client",
@@ -22,7 +27,7 @@ const testimonials = [
     feedback: [
       "Nikesh is extremely professional and detail-oriented. He understands project goals and aligns his work perfectly.",
       "His React and frontend expertise improved our user experience dramatically.",
-      "He is communicative, reliable, and someone we trust with important tasks."
+      "He is communicative, reliable, and someone we trust with important tasks.",
     ],
     name: "Manish Pandey",
     title: "Client",
@@ -34,7 +39,7 @@ const testimonials = [
     feedback: [
       "Nikesh demonstrates incredible technical skills and a deep understanding of complex systems.",
       "He proactively identifies issues and provides elegant solutions, helping our projects succeed.",
-      "Collaborating with him boosts confidence in delivering high-quality software."
+      "Collaborating with him boosts confidence in delivering high-quality software.",
     ],
     name: "Niraj Ojha",
     title: "Client",
@@ -46,7 +51,7 @@ const testimonials = [
     feedback: [
       "Nikesh is highly reliable and professional. He not only completes tasks efficiently but also adds value with suggestions and insights.",
       "He is easy to communicate with and ensures the project meets high standards.",
-      "Working with Nikesh gives peace of mind that projects are in excellent hands."
+      "Working with Nikesh gives peace of mind that projects are in excellent hands.",
     ],
     name: "Rubin Chaulagain",
     title: "Client",
@@ -57,73 +62,44 @@ const testimonials = [
 
 export const Testimonials = () => {
   const [activeIdx, setActiveIdx] = useState(0);
-  const [paragraphVisible, setParagraphVisible] = useState([]);
-  const [starsVisible, setStarsVisible] = useState([]);
-  const [photoSlide, setPhotoSlide] = useState(false);
+  const [isAnimatingPhoto, setIsAnimatingPhoto] = useState(true);
 
-  const animateTestimonial = (index) => {
-    const feedbackLength = testimonials[index].feedback.length;
-    const rating = testimonials[index].rating;
-
-    setParagraphVisible(Array(feedbackLength).fill(false));
-    setStarsVisible(Array(5).fill(false));
-    setPhotoSlide(true);
-
-    // animate paragraphs
-    testimonials[index].feedback.forEach((_, i) => {
-      setTimeout(() => {
-        setParagraphVisible((prev) => {
-          const updated = [...prev];
-          updated[i] = true;
-          return updated;
-        });
-      }, i * 300);
-    });
-
-    // animate stars
-    setTimeout(() => {
-      Array.from({ length: rating }).forEach((_, i) => {
-        setTimeout(() => {
-          setStarsVisible((prev) => {
-            const updated = [...prev];
-            updated[i] = true;
-            return updated;
-          });
-        }, i * 200);
-      });
-    }, feedbackLength * 300);
-
-    setTimeout(() => {
-      setPhotoSlide(false);
-    }, feedbackLength * 300 + rating * 200 + 500);
-  };
+  const activeTestimonial = useMemo(
+    () => testimonials[activeIdx],
+    [activeIdx]
+  );
 
   useEffect(() => {
-    animateTestimonial(activeIdx);
-  }, [activeIdx]);
+    setIsAnimatingPhoto(true);
 
-  // auto slide
+    const timer = setTimeout(() => {
+      setIsAnimatingPhoto(false);
+    }, activeTestimonial.feedback.length * 220 + activeTestimonial.rating * 140);
+
+    return () => clearTimeout(timer);
+  }, [activeTestimonial]);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveIdx((prev) => (prev + 1) % testimonials.length);
     }, 5000);
+
     return () => clearInterval(interval);
   }, []);
 
-  const next = () =>
-    setActiveIdx((prev) => (prev + 1) % testimonials.length);
+  const next = () => setActiveIdx((prev) => (prev + 1) % testimonials.length);
 
   const previous = () =>
     setActiveIdx((prev) => (prev - 1 + testimonials.length) % testimonials.length);
 
   return (
-    <section id="testimonials" className="py-16 relative overflow-hidden bg-background">
-
+    <section
+      id="testimonials"
+      className="py-16 relative overflow-hidden bg-background"
+    >
       <div className="absolute top-1/2 left-1/2 w-[800px] h-[800px] bg-muted/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
 
       <div className="container mx-auto px-6 relative z-10">
-
-        {/* HEADER */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-muted-foreground text-sm font-medium uppercase">
             What Clients Say
@@ -135,9 +111,7 @@ export const Testimonials = () => {
           </h2>
         </div>
 
-        {/* SLIDER */}
         <div className="max-w-4xl mx-auto relative overflow-hidden rounded-3xl glass-strong glow-border">
-
           <div
             className="flex transition-transform duration-500"
             style={{ transform: `translateX(-${activeIdx * 100}%)` }}
@@ -147,11 +121,9 @@ export const Testimonials = () => {
                 key={t.id}
                 className="min-w-full text-foreground flex flex-col md:flex-row items-center"
               >
-
-                {/* IMAGE */}
                 <div
-                  className={`w-full md:w-1/3 flex-shrink-0 transform transition-transform duration-500 ${
-                    photoSlide && idx === activeIdx
+                  className={`w-full md:w-1/3 flex-shrink-0 transform transition-transform duration-500 flex items-center justify-center p-6 ${
+                    isAnimatingPhoto && idx === activeIdx
                       ? "-translate-x-8 md:-translate-x-12"
                       : "translate-x-0"
                   }`}
@@ -159,42 +131,43 @@ export const Testimonials = () => {
                   <img
                     src={t.image}
                     alt={t.name}
-                    className="w-full h-full object-contain rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none animate-float"
+                    className="w-48 h-48 md:w-60 md:h-60 object-cover rounded-full animate-float border border-border bg-background"
+                    loading="lazy"
                   />
                 </div>
 
-                {/* CONTENT */}
                 <div className="p-6 md:p-12 md:w-2/3 relative">
-
                   <div className="absolute -top-4 left-8 w-12 h-12 rounded-full flex items-center justify-center bg-background">
                     <FaQuoteLeft className="w-6 h-6 text-primary" />
                   </div>
 
-                  {/* FEEDBACK */}
                   <div>
                     {t.feedback.map((para, i) => (
                       <p
                         key={i}
                         className={`mb-4 text-lg md:text-xl transition-all duration-500 ${
-                          paragraphVisible[i]
+                          idx === activeIdx
                             ? "opacity-100 translate-y-0"
                             : "opacity-0 -translate-y-4"
                         }`}
+                        style={{
+                          transitionDelay:
+                            idx === activeIdx ? `${i * 220}ms` : "0ms",
+                        }}
                       >
                         {para}
                       </p>
                     ))}
                   </div>
 
-                  {/* STARS */}
                   <div className="flex items-center mb-4 mt-2">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <FaStar
                         key={i}
-                        className={`mr-1 transition-transform duration-300 ${
+                        className={`mr-1 transition-all duration-300 ${
                           i < t.rating
-                            ? starsVisible[i]
-                              ? "scale-110 animate-bounce-once"
+                            ? idx === activeIdx
+                              ? "scale-110 opacity-100 animate-bounce-once"
                               : "scale-50 opacity-0"
                             : "opacity-20"
                         }`}
@@ -202,13 +175,16 @@ export const Testimonials = () => {
                           color:
                             i < t.rating
                               ? "var(--color-highlight)"
-                              : "var(--color-muted)"
+                              : "var(--color-muted)",
+                          transitionDelay:
+                            idx === activeIdx
+                              ? `${t.feedback.length * 220 + i * 140}ms`
+                              : "0ms",
                         }}
                       />
                     ))}
                   </div>
 
-                  {/* NAME */}
                   <div className="mt-2">
                     <div className="font-semibold text-lg">{t.name}</div>
                     <div className="text-sm text-muted-foreground">
@@ -216,15 +192,12 @@ export const Testimonials = () => {
                     </div>
                   </div>
                 </div>
-
               </div>
             ))}
           </div>
         </div>
 
-        {/* CONTROLS */}
         <div className="flex items-center justify-center gap-4 mt-6">
-
           <button
             onClick={previous}
             className="p-3 rounded-full bg-secondary hover:bg-muted transition"
@@ -253,18 +226,22 @@ export const Testimonials = () => {
         </div>
       </div>
 
-      {/* ANIMATION */}
       <style jsx>{`
         @keyframes bounce-once {
-          0% { transform: scale(0.5); }
-          50% { transform: scale(1.2); }
-          100% { transform: scale(1.1); }
+          0% {
+            transform: scale(0.5);
+          }
+          50% {
+            transform: scale(1.2);
+          }
+          100% {
+            transform: scale(1.1);
+          }
         }
         .animate-bounce-once {
           animation: bounce-once 0.3s forwards;
         }
       `}</style>
-
     </section>
   );
 };

@@ -62,14 +62,12 @@ export const Projects = () => {
     },
   ];
 
-  // 🔍 SEARCH FILTER
   const filteredProjects = projects.filter((project) =>
     `${project.title} ${project.description} ${project.technologies.join(" ")}`
       .toLowerCase()
       .includes(searchQuery.toLowerCase())
   );
 
-  // 📄 PAGINATION
   const paginatedProjects = [];
   for (let i = 0; i < filteredProjects.length; i += projectsPerPage) {
     paginatedProjects.push(filteredProjects.slice(i, i + projectsPerPage));
@@ -87,7 +85,6 @@ export const Projects = () => {
           My Selected Projects
         </h2>
 
-        {/* 🔍 SEARCH INPUT */}
         <motion.input
           type="text"
           placeholder="Search projects"
@@ -102,14 +99,12 @@ export const Projects = () => {
           className="w-full mb-8 px-4 py-2 border rounded-lg bg-background text-foreground"
         />
 
-        {/* ❌ NO RESULTS */}
         {filteredProjects.length === 0 && (
           <p className="text-center text-muted-foreground">
             No projects found.
           </p>
         )}
 
-        {/* 🔥 PROJECT LIST */}
         <div className="overflow-hidden">
           <div
             className="flex transition-transform duration-500 ease-in-out"
@@ -128,7 +123,11 @@ export const Projects = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -30 }}
                       transition={{ duration: 0.4 }}
-                      onMouseEnter={() => setCursorPreview(project)}
+                      onMouseEnter={() => {
+                        if (window.innerWidth >= 1024) {
+                          setCursorPreview(project);
+                        }
+                      }}
                       onMouseMove={(e) =>
                         setCursorPos({ x: e.clientX, y: e.clientY })
                       }
@@ -162,7 +161,6 @@ export const Projects = () => {
           </div>
         </div>
 
-        {/* 🔵 PAGINATION */}
         {filteredProjects.length > 0 && (
           <div className="flex justify-center gap-4 mt-8">
             <button
@@ -196,26 +194,28 @@ export const Projects = () => {
         )}
       </div>
 
-      {/* 🟡 CURSOR PREVIEW */}
       {cursorPreview && (
         <div
-          className="fixed pointer-events-none z-50"
+          className="fixed pointer-events-none z-50 hidden lg:block"
           style={{
-            top: cursorPos.y + 20,
-            left: cursorPos.x + 20,
+            top: Math.min(cursorPos.y + 20, window.innerHeight - 200),
+            left: Math.min(cursorPos.x + 20, window.innerWidth - 300),
           }}
         >
-          <div className="w-64 h-40 rounded-xl overflow-hidden shadow-2xl border">
+          <div className="w-64 h-40 rounded-xl overflow-hidden shadow-2xl border bg-background">
             <img
               src={cursorPreview.image}
               className="w-full h-full object-cover"
-              alt="preview"
+              alt={`${cursorPreview.title} preview`}
+              loading="lazy"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
             />
           </div>
         </div>
       )}
 
-      {/* 🔥 FULL VIEW */}
       {openFullView && selectedProject && (
         <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
           <button
@@ -238,9 +238,7 @@ export const Projects = () => {
                   {selectedProject.title}
                 </h2>
 
-                <p className="mb-6">
-                  {selectedProject.description}
-                </p>
+                <p className="mb-6">{selectedProject.description}</p>
 
                 <div className="flex flex-wrap gap-3">
                   {selectedProject.technologies.map((tech, i) => (
@@ -266,9 +264,7 @@ export const Projects = () => {
 
                 <button
                   className="glow-btn mt-6 px-4 py-2 bg-primary text-white rounded"
-                  onClick={() =>
-                    window.open(selectedProject.github, "_blank")
-                  }
+                  onClick={() => window.open(selectedProject.github, "_blank")}
                 >
                   Visit Project
                 </button>

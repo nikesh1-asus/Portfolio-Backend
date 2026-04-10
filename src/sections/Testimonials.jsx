@@ -111,7 +111,7 @@ export const Testimonials = () => {
           </h2>
         </div>
 
-        <div className="max-w-4xl mx-auto relative overflow-hidden rounded-3xl glass-strong glow-border">
+        <div className="max-w-6xl mx-auto relative overflow-hidden rounded-3xl glass-strong glow-border">
           <div
             className="flex transition-transform duration-500"
             style={{ transform: `translateX(-${activeIdx * 100}%)` }}
@@ -122,7 +122,7 @@ export const Testimonials = () => {
                 className="min-w-full text-foreground flex flex-col md:flex-row items-center"
               >
                 <div
-                  className={`w-full md:w-2/5 flex-shrink-0 transform transition-transform duration-500 flex items-center justify-center p-6 ${
+                  className={`w-full md:w-1/2 flex-shrink-0 transform transition-transform duration-500 flex items-center justify-center p-6 md:p-12 ${
                     isAnimatingPhoto && idx === activeIdx
                       ? "-translate-x-8 md:-translate-x-12"
                       : "translate-x-0"
@@ -131,13 +131,13 @@ export const Testimonials = () => {
                   <img
                     src={t.image}
                     alt={t.name}
-                    className="w-56 h-56 md:w-64 md:h-64 object-cover rounded-3xl animate-float border-2 border-primary/20 bg-background shadow-2xl"
+                    className="w-72 h-72 md:w-[400px] md:h-[400px] object-cover rounded-3xl animate-float border-2 border-primary/20 bg-background shadow-2xl"
                     loading="lazy"
                   />
                 </div>
 
-                <div className="p-6 md:p-12 md:w-2/3 relative">
-                  <div className="absolute -top-4 left-8 w-12 h-12 rounded-full flex items-center justify-center bg-background">
+                <div className="p-8 md:p-16 md:w-1/2 relative">
+                  <div className="absolute top-4 left-8 w-12 h-12 rounded-full flex items-center justify-center bg-background shadow-sm">
                     <FaQuoteLeft className="w-6 h-6 text-primary" />
                   </div>
 

@@ -1,33 +1,16 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+import { fileURLToPath } from "url";
 
-// Fix for __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
-
-  // ✅ IMPORTANT: required for GitHub Pages
-  base: "/Dev-Personal-Portfolio/",
-
+  plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
-
-  server: {
-    host: true,
-    port: 5173,
-  },
-
-  build: {
-    outDir: 'dist',
-    sourcemap: false,
-  }
-})
+  base: "/Dev-Personal-Portfolio/", // MUST match repo name exactly
+});

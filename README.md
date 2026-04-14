@@ -73,6 +73,6 @@ RECAPTCHA_SECRET=your_google_recaptcha_secret
 
 ADMIN_KEY=your_admin_secret_key
 
-FRONTEND_URL= https://your-frontend-domain.com
+FRONTEND_URL= (Your Name..)-domain.com
 
 PORT=5000

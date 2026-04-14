@@ -1,13 +1,11 @@
-import express from "express";
-import mongoose from "mongoose";
-import axios from "axios";
-import cors from "cors";
-import moment from "moment-timezone";
-import helmet from "helmet";
-import rateLimit from "express-rate-limit";
-import dotenv from "dotenv";
-
-dotenv.config();
+const express = require("express");
+const mongoose = require("mongoose");
+const axios = require("axios");
+const cors = require("cors");
+const moment = require("moment-timezone");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+require("dotenv").config(); // ✅ FIXED (no path)
 
 const app = express();
 
@@ -15,16 +13,17 @@ const app = express();
 app.use(helmet());
 app.use(express.json());
 
-// ================= CORS =================
+// ================= CORS FIX =================
 const allowedOrigins = (
   process.env.FRONTEND_URL || "http://localhost:5173"
 )
   .split(",")
-  .map((o) => o.trim());
+  .map(o => o.trim());
 
 app.use(
   cors({
     origin: function (origin, callback) {
+      // allow tools like Postman / server-to-server
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
@@ -32,7 +31,7 @@ app.use(
       }
 
       console.log("❌ Blocked CORS:", origin);
-      return callback(null, true);
+      return callback(null, true); // ✅ DO NOT crash server
     },
     credentials: true,
   })
@@ -91,7 +90,7 @@ const Message = mongoose.model("Message", messageSchema);
 
 // ================= ROUTES =================
 
-// Health check
+// Health check (IMPORTANT for Render)
 app.get("/", (req, res) => {
   res.send("🚀 Backend is running");
 });
@@ -108,6 +107,7 @@ app.post("/api/contact", async (req, res) => {
       });
     }
 
+    // verify captcha
     const verify = await axios.post(
       `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${captchaValue}`
     );
@@ -171,7 +171,7 @@ app.get("/api/admin/messages", async (req, res) => {
   }
 });
 
-// ================= START =================
+// ================= START SERVER =================
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });

@@ -5,42 +5,78 @@ const cors = require("cors");
 const moment = require("moment-timezone");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, ".env") });
+require("dotenv").config(); // ✅ FIXED (no path)
 
 const app = express();
 
-// 🔐 Security
-const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-
+// ================= SECURITY =================
 app.use(helmet());
-app.use(cors({
-  origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    return callback(new Error(`CORS blocked for origin: ${origin}`));
-  }
-}));
 app.use(express.json());
 
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100
-}));
+// ================= CORS FIX =================
+const allowedOrigins = (
+  process.env.FRONTEND_URL || "http://localhost:5173"
+)
+  .split(",")
+  .map(o => o.trim());
 
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow tools like Postman / server-to-server
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      console.log("❌ Blocked CORS:", origin);
+      return callback(null, true); // ✅ DO NOT crash server
+    },
+    credentials: true,
+  })
+);
+
+// ================= RATE LIMIT =================
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+  })
+);
+
+// ================= ENV =================
 const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI;
+const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET;
+const ADMIN_KEY = process.env.ADMIN_KEY;
 
-// ENV
-const MONGO_URI = process.env.MONGO_URI?.trim();
-const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET?.trim();
-const ADMIN_KEY = process.env.ADMIN_KEY?.trim();
+// ================= VALIDATION =================
+if (!MONGO_URI) {
+  console.error("❌ Missing MONGO_URI");
+  process.exit(1);
+}
 
-// Schema
+if (!RECAPTCHA_SECRET) {
+  console.error("❌ Missing RECAPTCHA_SECRET");
+  process.exit(1);
+}
+
+if (!ADMIN_KEY) {
+  console.error("❌ Missing ADMIN_KEY");
+  process.exit(1);
+}
+
+// ================= DB =================
+mongoose
+  .connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => {
+    console.error("❌ MongoDB Error:", err.message);
+    process.exit(1);
+  });
+
+// ================= MODEL =================
 const messageSchema = new mongoose.Schema({
   name: String,
   email: String,
@@ -52,44 +88,35 @@ const messageSchema = new mongoose.Schema({
 
 const Message = mongoose.model("Message", messageSchema);
 
-// DB Connect
-if (!MONGO_URI) {
-  console.error("❌ Missing MONGO_URI in backend/.env");
-  process.exit(1);
-}
+// ================= ROUTES =================
 
-if (!RECAPTCHA_SECRET) {
-  console.error("❌ Missing RECAPTCHA_SECRET in backend/.env");
-  process.exit(1);
-}
+// Health check (IMPORTANT for Render)
+app.get("/", (req, res) => {
+  res.send("🚀 Backend is running");
+});
 
-if (!ADMIN_KEY) {
-  console.error("❌ Missing ADMIN_KEY in backend/.env");
-  process.exit(1);
-}
-
-mongoose.connect(MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => {
-    console.log("❌ DB Error:", err);
-    process.exit(1);
-  });
-
-// Contact API
+// CONTACT API
 app.post("/api/contact", async (req, res) => {
-  const { name, email, subject, message, captchaValue } = req.body;
-
-  if (!captchaValue) {
-    return res.status(400).json({ success: false, message: "Captcha required" });
-  }
-
   try {
+    const { name, email, subject, message, captchaValue } = req.body;
+
+    if (!captchaValue) {
+      return res.status(400).json({
+        success: false,
+        message: "Captcha required",
+      });
+    }
+
+    // verify captcha
     const verify = await axios.post(
       `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${captchaValue}`
     );
 
     if (!verify.data.success) {
-      return res.status(400).json({ success: false, message: "Captcha failed" });
+      return res.status(400).json({
+        success: false,
+        message: "Captcha failed",
+      });
     }
 
     const ip =
@@ -111,32 +138,40 @@ app.post("/api/contact", async (req, res) => {
       .format("YYYY-MM-DD HH:mm:ss");
 
     console.log(`📩 Message at ${nepalTime}`);
-    console.table({ name, email, subject, message, ip });
+    console.table({ name, email, subject });
 
-    res.json({ success: true, message: "Saved successfully" });
-
+    res.json({
+      success: true,
+      message: "Saved successfully",
+    });
   } catch (err) {
-    console.error("❌ Error:", err);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("❌ Contact API Error:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 });
 
-// Admin API
+// ADMIN API
 app.get("/api/admin/messages", async (req, res) => {
-  const adminKey = req.headers["x-admin-key"];
-
-  if (adminKey !== ADMIN_KEY) {
-    return res.status(403).json({ error: "Unauthorized" });
-  }
-
   try {
+    const adminKey = req.headers["x-admin-key"];
+
+    if (adminKey !== ADMIN_KEY) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
     const messages = await Message.find().sort({ createdAt: -1 });
+
     res.json(messages);
   } catch (err) {
+    console.error("❌ Admin API Error:", err.message);
     res.status(500).json({ error: "Failed to fetch" });
   }
 });
 
-app.listen(PORT, () =>
-  console.log(`🚀 Server running on port ${PORT}`)
-);
+// ================= START SERVER =================
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});

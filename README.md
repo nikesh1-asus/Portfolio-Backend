@@ -11,9 +11,6 @@ It handles contact form submissions, stores messages securely, and provides admi
 
 https://portfolio-backend-j9vw.onrender.com
 
-:contentReference[oaicite:0]{index=0}  
-
----
 
 ## 🛠 Tech Stack
 
@@ -71,7 +68,11 @@ Create a .env file:
 
 
 MONGO_URI=your_mongodb_connection_string
+
 RECAPTCHA_SECRET=your_google_recaptcha_secret
+
 ADMIN_KEY=your_admin_secret_key
-FRONTEND_URL=https://your-frontend-domain.com
+
+FRONTEND_URL= https://your-frontend-domain.com
+
 PORT=5000

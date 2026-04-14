@@ -5,7 +5,7 @@ const cors = require("cors");
 const moment = require("moment-timezone");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-require("dotenv").config(); // ✅ FIXED (no path)
+require("dotenv").config();
 
 const app = express();
 
@@ -13,17 +13,15 @@ const app = express();
 app.use(helmet());
 app.use(express.json());
 
-// ================= CORS FIX =================
-const allowedOrigins = (
-  process.env.FRONTEND_URL || "http://localhost:5173"
-)
+// ================= CORS =================
+const allowedOrigins = (process.env.FRONTEND_URL || "")
   .split(",")
-  .map(o => o.trim());
+  .map((o) => o.trim())
+  .filter(Boolean);
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // allow tools like Postman / server-to-server
+    origin: (origin, callback) => {
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
@@ -31,7 +29,7 @@ app.use(
       }
 
       console.log("❌ Blocked CORS:", origin);
-      return callback(null, true); // ✅ DO NOT crash server
+      return callback(null, true);
     },
     credentials: true,
   })
@@ -90,12 +88,12 @@ const Message = mongoose.model("Message", messageSchema);
 
 // ================= ROUTES =================
 
-// Health check (IMPORTANT for Render)
+// HEALTH CHECK
 app.get("/", (req, res) => {
   res.send("🚀 Backend is running");
 });
 
-// CONTACT API
+// ================= CONTACT API =================
 app.post("/api/contact", async (req, res) => {
   try {
     const { name, email, subject, message, captchaValue } = req.body;
@@ -107,9 +105,16 @@ app.post("/api/contact", async (req, res) => {
       });
     }
 
-    // verify captcha
+    // ✅ FIXED reCAPTCHA verification (IMPORTANT)
     const verify = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${captchaValue}`
+      "https://www.google.com/recaptcha/api/siteverify",
+      null,
+      {
+        params: {
+          secret: RECAPTCHA_SECRET,
+          response: captchaValue,
+        },
+      }
     );
 
     if (!verify.data.success) {
@@ -137,7 +142,7 @@ app.post("/api/contact", async (req, res) => {
       .tz("Asia/Kathmandu")
       .format("YYYY-MM-DD HH:mm:ss");
 
-    console.log(`📩 Message at ${nepalTime}`);
+    console.log(`📩 Message received at ${nepalTime}`);
     console.table({ name, email, subject });
 
     res.json({
@@ -153,7 +158,7 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
-// ADMIN API
+// ================= ADMIN API =================
 app.get("/api/admin/messages", async (req, res) => {
   try {
     const adminKey = req.headers["x-admin-key"];
